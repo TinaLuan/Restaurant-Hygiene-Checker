@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">RestaurantHygieneChecker</string>
+    <string name="title_activity_map">Map</string>
+    <string name="localSearch_button_text">LOCAL SEARCH</string>
+    <string name="simpleSearch_button_text">SIMPLE SEARCH</string>
+    <string name="advancedSearch_button_text">ADVANCED SEARCH</string>
+</resources>
