@@ -1,8 +1,11 @@
 package tluan.restauranthygienechecker;
 //https://www.youtube.com/watch?v=_Oljjn1fIAc&t=759s
+//https://www.youtube.com/watch?v=dr0zEmuDuIk&t=144s
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.annotation.NonNull;
@@ -13,6 +16,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +30,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -33,11 +40,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private GoogleMap mMap;
     private GoogleApiClient client;
-    private LocationRequest locationRequest;
+    //private LocationRequest locationRequest;
     private Location lastlocation;
-    private Marker currentLocationmMarker;
+    //private Marker currentLocationmMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
     int PROXIMITY_RADIUS = 10000;
+
     double latitude,longitude;
     //public final static String LOCATION_PERMISSION = "location_permission";
     //private boolean permission;
@@ -75,12 +83,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 //        mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
 
     }
 
@@ -161,7 +163,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-
+/*
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         lastlocation = location;
@@ -184,6 +186,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
         }
+        */
     }
 
     @Override
@@ -217,9 +220,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     public void onSimpleSearch(View view) {
-        String input = ((TextView)findViewById(R.id.input)).getText().toString();
-        if (input.length() > 0) {
+        String input = ((EditText)findViewById(R.id.input)).getText().toString();
+        if (input != null && input.length() > 0) {
+            Geocoder geocoder = new Geocoder(this);
+            Address address = null;
+            try {
+                List<Address> addressList = geocoder.getFromLocationName(input, 1);
+                address = addressList.get(0);
+                Log.d("address: ", address.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Searched Location Marker"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(3));
         }
     }
 }
