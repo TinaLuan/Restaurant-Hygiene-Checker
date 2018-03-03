@@ -39,6 +39,7 @@
     <Button
         android:id="@+id/AdvancedSearch_button"
         android:text="@string/advancedSearch_button_text"
+        android:onClick="onAdvancedSearch"
         android:layout_toEndOf="@+id/simpleSearch_button"
         android:layout_below="@+id/input"
 

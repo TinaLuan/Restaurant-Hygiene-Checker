@@ -74,6 +74,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private final int NUM_LOCAL_SEARCH_RESULTS = 15;
     private ArrayList<Establishment> establishments = new ArrayList<>();
+    private final int FILTER_ACTIVITY_REQ_CODE = 1;
 
     private double latitude,longitude;
 
@@ -246,29 +247,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    /*
-    public void onSimpleSearch(View view) {
-        String input = ((EditText)findViewById(R.id.input)).getText().toString();
-        if (input != null && input.length() > 0) {
-            Geocoder geocoder = new Geocoder(this);
-            Address address = null;
-            try {
-                List<Address> addressList = geocoder.getFromLocationName(input, 1);
-                address = addressList.get(0);
-                Log.d("address: ", address.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Searched Location Marker"));
-            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            //mMap.animateCamera(CameraUpdateFactory.zoomBy(3));
-        }
-    }
-    */
-
     public void onSimpleSearch(View view) {
         String input = ((EditText)findViewById(R.id.input)).getText().toString();
         if (input != null && input.length() > 0) {
@@ -279,7 +257,26 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
+    public void onAdvancedSearch(View view) {
+        Intent intent = new Intent(this, FilterActivity.class);
+        //intent.putExtra(ResultsActivity.TEAM_NAME, winnerTeamName());
+        //intent.putExtra(ResultsActivity.PLAYER_NAMES, winnerPlayerNames());
+        startActivityForResult(intent, FILTER_ACTIVITY_REQ_CODE);
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (FILTER_ACTIVITY_REQ_CODE) : {
+                if (resultCode == RESULT_OK) {
+                    String returnValue = data.getStringExtra("some_key");
+                    Log.d("return", returnValue);
+                }
+                break;
+            }
+        }
+    }
     private void queryFSA(String URLsuffix) {
 
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
