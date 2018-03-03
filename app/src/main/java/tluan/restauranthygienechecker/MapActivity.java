@@ -47,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 10;
     private static final String TAG = MapActivity.class.getSimpleName();
+
+    private ArrayList<Establishment> establishments = new ArrayList<>();
 
     private double latitude,longitude;
 
@@ -251,9 +254,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
                             String URLsuffix = "Establishments?longitude=" + lng + "&latitude=" + lat +
-                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=15";
+                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=2";
                             queryFSA(URLsuffix);
-                            //Log.d("loc: ", String.valueOf(lat) + " "+String.valueOf(lng));
 
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -280,8 +282,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     // Called when a response is received.
                     @Override
                     public void onResponse(JSONObject response) {
-                        //Log.d("in", "response");
-                        Log.d("result", (String.valueOf(response)));
+
+                        parseResponse(response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -303,7 +305,33 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-    private void addMarkers() {
+    private void parseResponse(JSONObject response) {
+        establishments.clear();
+        try {
+            JSONArray array = response.getJSONArray("establishments");
+            Log.d("establishments", (String.valueOf(array)));
+            for (int i=0; i<array.length(); i++) {
+                JSONObject jObj = array.getJSONObject(i);
+                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
+                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
+                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
+                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
+                        jObj.getJSONObject("scores").getInt("Hygiene"), jObj.getJSONObject("geocode").getString("longitude"),
+                        jObj.getJSONObject("geocode").getString("latitude"));
+                establishments.add(est);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        addMarkers(establishments);
+    }
+    private void addMarkers(ArrayList<Establishment> estList) {
+        for (Establishment est : estList) {
+            LatLng marker = new LatLng(Double.parseDouble(est.getLatitude()), Double.parseDouble(est.getLongitude()));
+            mMap.addMarker(new MarkerOptions().position(marker)
+                    .title(est.getBusinessName()));
+        }
 
     }
 
