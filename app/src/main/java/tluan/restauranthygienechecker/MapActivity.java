@@ -76,6 +76,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private ArrayList<Establishment> establishments = new ArrayList<>();
     private final int FILTER_ACTIVITY_REQ_CODE = 1;
 
+
     private double latitude,longitude;
 
     //public final static String LOCATION_PERMISSION = "location_permission";

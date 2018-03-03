@@ -11,7 +11,7 @@
         android:ems="12"
         android:inputType="textAutoCorrect|textAutoComplete"
 
-        android:hint="Type here to search"
+        android:hint="Type business name to do simple or advanced search"
 
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
