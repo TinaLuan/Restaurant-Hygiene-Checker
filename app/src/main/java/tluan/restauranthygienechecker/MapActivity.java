@@ -72,6 +72,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private static final int DEFAULT_ZOOM = 10;
     private static final String TAG = MapActivity.class.getSimpleName();
 
+    private final int NUM_LOCAL_SEARCH_RESULTS = 15;
     private ArrayList<Establishment> establishments = new ArrayList<>();
 
     private double latitude,longitude;
@@ -201,33 +202,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-//    public void onLocalSearch(View view) {
-//        mMap.clear();
-//        getDeviceLocation();
-//
-//
-//    }
-
-    public void onSimpleSearch(View view) {
-        String input = ((EditText)findViewById(R.id.input)).getText().toString();
-        if (input != null && input.length() > 0) {
-            Geocoder geocoder = new Geocoder(this);
-            Address address = null;
-            try {
-                List<Address> addressList = geocoder.getFromLocationName(input, 1);
-                address = addressList.get(0);
-                Log.d("address: ", address.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Searched Location Marker"));
-            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            //mMap.animateCamera(CameraUpdateFactory.zoomBy(3));
-        }
-    }
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -254,7 +228,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
                             String URLsuffix = "Establishments?longitude=" + lng + "&latitude=" + lat +
-                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=2";
+                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=" + String.valueOf(NUM_LOCAL_SEARCH_RESULTS);
                             queryFSA(URLsuffix);
 
                         } else {
@@ -271,6 +245,40 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    /*
+    public void onSimpleSearch(View view) {
+        String input = ((EditText)findViewById(R.id.input)).getText().toString();
+        if (input != null && input.length() > 0) {
+            Geocoder geocoder = new Geocoder(this);
+            Address address = null;
+            try {
+                List<Address> addressList = geocoder.getFromLocationName(input, 1);
+                address = addressList.get(0);
+                Log.d("address: ", address.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Searched Location Marker"));
+            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            //mMap.animateCamera(CameraUpdateFactory.zoomBy(3));
+        }
+    }
+    */
+
+    public void onSimpleSearch(View view) {
+        String input = ((EditText)findViewById(R.id.input)).getText().toString();
+        if (input != null && input.length() > 0) {
+            String URLsuffix = "Establishments?name="+ input +
+                    "&sortOptionKey=Rating&pageNumber=1&pageSize=5";
+            queryFSA(URLsuffix);
+        }
+
+    }
+
 
     private void queryFSA(String URLsuffix) {
 
@@ -309,9 +317,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         establishments.clear();
         try {
             JSONArray array = response.getJSONArray("establishments");
-            Log.d("establishments", (String.valueOf(array)));
+
             for (int i=0; i<array.length(); i++) {
                 JSONObject jObj = array.getJSONObject(i);
+
+                Log.d("one", (String.valueOf(jObj)));
+
                 Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
                         jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
                         jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
@@ -326,11 +337,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
         addMarkers(establishments);
     }
+
     private void addMarkers(ArrayList<Establishment> estList) {
         for (Establishment est : estList) {
-            LatLng marker = new LatLng(Double.parseDouble(est.getLatitude()), Double.parseDouble(est.getLongitude()));
-            mMap.addMarker(new MarkerOptions().position(marker)
-                    .title(est.getBusinessName()));
+            if (est.hasLatLng()) {
+                LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(marker)
+                        .title(est.getBusinessName()));
+            }
         }
 
     }

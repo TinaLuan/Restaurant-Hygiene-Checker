@@ -13,13 +13,16 @@ public class Establishment {
     private String localAuthorityName;
     private String localAuthorityEmailAddress;
     private int scoreHygiene;
-    private String longitude;
-    private String latitude;
+    private String lngStr;
+    private String latStr;
+    private boolean hasLatLng;
+    private Double lng;
+    private Double lat;
 
     public Establishment(String FHRSID, String businessName,
                          String businessType, String addressLine, String localAuthorityName,
-                         String localAuthorityEmailAddress, int scoreHygiene, String longitude,
-                         String latitude) {
+                         String localAuthorityEmailAddress, int scoreHygiene, String lngStr,
+                         String latStr) {
         this.FHRSID = FHRSID;
         this.businessName = businessName;
         this.businessType = businessType;
@@ -27,8 +30,18 @@ public class Establishment {
         this.localAuthorityName = localAuthorityName;
         this.localAuthorityEmailAddress = localAuthorityEmailAddress;
         this.scoreHygiene = scoreHygiene;
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.lngStr = lngStr;
+        this.latStr = latStr;
+
+        if (latStr !=null && lngStr != null && !latStr.equals("null") && !lngStr.equals("null")) {
+            lat = Double.parseDouble(latStr);
+            lng = Double.parseDouble(lngStr);
+            hasLatLng = true;
+        } else {
+            lng = null;
+            lat = null;
+            hasLatLng = false;
+        }
     }
 
     public String getFHRSID() {
@@ -59,14 +72,17 @@ public class Establishment {
         return scoreHygiene;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public Double getLongitude() {
+        return lng;
     }
 
-    public String getLatitude() {
-        return latitude;
+    public Double getLatitude() {
+        return lat;
     }
 
+    public boolean hasLatLng() {
+        return hasLatLng;
+    }
     /*
             "LocalAuthorityBusinessID": "sample string 2",
             "BusinessName": "sample string 3",
