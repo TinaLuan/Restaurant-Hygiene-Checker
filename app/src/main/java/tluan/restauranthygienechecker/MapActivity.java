@@ -24,6 +24,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -46,7 +47,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
@@ -198,6 +201,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     public void onLocalSearch(View view) {
         mMap.clear();
         getDeviceLocation();
+
+
     }
 
     public void onSimpleSearch(View view) {
@@ -245,8 +250,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
 
-                            Log.d("loc: ", String.valueOf(lat)
-                                    + " "+String.valueOf(lng));
+                            //Log.d("loc: ", String.valueOf(lat) + " "+String.valueOf(lng));
 
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -266,41 +270,38 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private void queryFSA() {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        //final String productsURL = "https://www.sjjg.uk/coffee-shop/getAllProducts";
-        //final String tryURL = "https://www.food.gov.uk/ratings/SortOptions";
+        final String URL = "http://api.ratings.food.gov.uk/SortOptions";
 
-        //Session.Request.Headers.Add("x-api-version", 2);
-
-        JsonArrayRequest tryReq = new JsonArrayRequest(Request.Method.GET, tryURL, null,
-                new Response.Listener<JSONArray>() {
+        JsonObjectRequest objRequest = new JsonObjectRequest(URL, null,
+                new Response.Listener<JSONObject>() {
+                    // Called when a response is received.
                     @Override
-                    public void onResponse(JSONArray response) {
-                        Log.e("result", (String.valueOf(response)));
+                    public void onResponse(JSONObject response) {
+                        //Log.d("in", "response");
+                        Log.d("result", (String.valueOf(response)));
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.e("error" , "!");
                     }
                 }
-        );
-//        JsonArrayRequest GETRequest = new JsonArrayRequest(Request.Method.GET, productsURL, null,
-//                new Response.Listener<JSONArray>() {
-//                    @Override
-//                    public void onResponse(JSONArray response) {
-//                        Log.e("result", (String.valueOf(response)));
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//
-//                    }
-//                }
-//        );
-//        requestQueue.add(GETRequest);
-        requestQueue.add(tryReq);
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("x-api-version", "2");
+                return params;
+            }
+        };
+        requestQueue.add(objRequest);
+
+    }
+
+    private void addMarkers() {
+
     }
 
     // Check and ask for permission
