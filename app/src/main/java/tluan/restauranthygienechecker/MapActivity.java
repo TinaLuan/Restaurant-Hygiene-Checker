@@ -198,12 +198,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-    public void onLocalSearch(View view) {
-        mMap.clear();
-        getDeviceLocation();
-
-
-    }
+//    public void onLocalSearch(View view) {
+//        mMap.clear();
+//        getDeviceLocation();
+//
+//
+//    }
 
     public void onSimpleSearch(View view) {
         String input = ((EditText)findViewById(R.id.input)).getText().toString();
@@ -229,7 +229,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    private void getDeviceLocation() {
+    public void onLocalSearch(View view) {
+        mMap.clear();
+
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -245,11 +247,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             mLastKnownLocation = task.getResult();
                             double lat = mLastKnownLocation.getLatitude();
                             double lng = mLastKnownLocation.getLongitude();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(lat, lng), DEFAULT_ZOOM));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( new LatLng(lat, lng), DEFAULT_ZOOM));
 
 
-
+                            String URLsuffix = "Establishments?longitude=" + lng + "&latitude=" + lat +
+                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=15";
+                            queryFSA(URLsuffix);
                             //Log.d("loc: ", String.valueOf(lat) + " "+String.valueOf(lng));
 
                         } else {
@@ -267,11 +270,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    private void queryFSA() {
+    private void queryFSA(String URLsuffix) {
+
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        final String URL = "http://api.ratings.food.gov.uk/SortOptions";
-
+        String URL = "http://api.ratings.food.gov.uk/" + URLsuffix;
         JsonObjectRequest objRequest = new JsonObjectRequest(URL, null,
                 new Response.Listener<JSONObject>() {
                     // Called when a response is received.
