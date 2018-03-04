@@ -263,6 +263,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         //intent.putExtra(ResultsActivity.TEAM_NAME, winnerTeamName());
         //intent.putExtra(ResultsActivity.PLAYER_NAMES, winnerPlayerNames());
         startActivityForResult(intent, FILTER_ACTIVITY_REQ_CODE);
+        //String URLsuffix = "BusinessTypes/basic";
+        //Log.d("advanced", "clicked");
+        //queryFSA(URLsuffix);
     }
 
     @Override
@@ -288,14 +291,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     // Called when a response is received.
                     @Override
                     public void onResponse(JSONObject response) {
+                        Log.d("response", String.valueOf(response));
 
-                        parseResponse(response);
+                        //parseResponse(response);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("error" , "!");
+                        Log.e("errorQuery" , "!");
                     }
                 }
         ) {
