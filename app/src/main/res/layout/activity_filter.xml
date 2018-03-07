@@ -1,28 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="tluan.restauranthygienechecker.FilterActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/businessTypeText"
+        android:text="Business Type:"
         android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="text In Filter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
 
     <Spinner
         android:id="@+id/businessType"
 
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"></Spinner>
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/businessTypeText"
+        android:popupBackground="@android:color/holo_blue_dark"></Spinner>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/ratingText"
+        android:text="Rating:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/businessTypeText"/>
+
+    <Spinner
+        android:id="@+id/rating"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/businessType"
+        android:layout_toEndOf="@+id/ratingText"
+        android:popupBackground="@android:color/holo_blue_dark"></Spinner>
+
+    <TextView
+        android:id="@+id/authorityText"
+        android:text="Authority:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ratingText"/>
+    <Spinner
+        android:id="@+id/authority"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/authorityText"
+        android:layout_below="@+id/rating"></Spinner>
+
+    <TextView
+        android:id="@+id/regionText"
+        android:text="Region:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/authorityText"/>
+    <Spinner
+        android:id="@+id/region"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/regionText"
+        android:layout_below="@+id/authority"></Spinner>
+
+</RelativeLayout>

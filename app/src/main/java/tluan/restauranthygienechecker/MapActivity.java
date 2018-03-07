@@ -52,10 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private GoogleApiClient client;
@@ -115,94 +112,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
         permission();
-//        mMap.setMyLocationEnabled(true);
-        mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
 
     }
 
-    @Override
-    public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        Log.d("enable: ", String.valueOf(mMap.isMyLocationEnabled()));
-        return false;
-    }
-
-    @Override
-    public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
-    }
-
-
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        lastlocation = location;
-        if(currentLocationmMarker != null)
-        {
-            currentLocationmMarker.remove();
-
-        }
-        Log.d("lat = ",""+latitude);
-        LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentLocationmMarker = mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
-
-        if(client != null)
-        {
-            //LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
-        }
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-//        locationRequest = new LocationRequest();
-//        locationRequest.setInterval(100);
-//        locationRequest.setFastestInterval(1000);
-//        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-//
-//
-//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)
-//        {
-//            LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
-//        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 
 
     /**
@@ -286,6 +198,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         String URL = "http://api.ratings.food.gov.uk/" + URLsuffix;
+        System.out.println("URL:"+URL);
         JsonObjectRequest objRequest = new JsonObjectRequest(URL, null,
                 new Response.Listener<JSONObject>() {
                     // Called when a response is received.
@@ -293,7 +206,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     public void onResponse(JSONObject response) {
                         Log.d("response", String.valueOf(response));
 
-                        //parseResponse(response);
+                        parseResponse(response);
                     }
                 },
                 new Response.ErrorListener() {
