@@ -73,6 +73,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private ArrayList<Establishment> establishments = new ArrayList<>();
     private final int FILTER_ACTIVITY_REQ_CODE = 1;
 
+    private int businessTypeSelectedID;
+    private int ratingSelectedID;
+    private int countrySelectedID;
+    private int authoritySelectedID;
 
     private double latitude,longitude;
 
@@ -172,12 +176,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     public void onAdvancedSearch(View view) {
         Intent intent = new Intent(this, FilterActivity.class);
-        //intent.putExtra(ResultsActivity.TEAM_NAME, winnerTeamName());
-        //intent.putExtra(ResultsActivity.PLAYER_NAMES, winnerPlayerNames());
+
         startActivityForResult(intent, FILTER_ACTIVITY_REQ_CODE);
-        //String URLsuffix = "BusinessTypes/basic";
-        //Log.d("advanced", "clicked");
-        //queryFSA(URLsuffix);
+
     }
 
     @Override
@@ -186,8 +187,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         switch(requestCode) {
             case (FILTER_ACTIVITY_REQ_CODE) : {
                 if (resultCode == RESULT_OK) {
-                    String returnValue = data.getStringExtra("some_key");
-                    Log.d("return", returnValue);
+                    businessTypeSelectedID = data.getIntExtra("businessTypeSelectedID" , businessTypeSelectedID);
+                    ratingSelectedID = data.getIntExtra("ratingSelectedID", ratingSelectedID);
+                    countrySelectedID = data.getIntExtra("countrySelectedID", countrySelectedID);
+                    authoritySelectedID = data.getIntExtra("authoritySelectedID", authoritySelectedID);
+                    Log.d("!!!!return", String.valueOf(businessTypeSelectedID) + " "+ String.valueOf(ratingSelectedID)
+                            + " "+ String.valueOf(countrySelectedID) + " "+String.valueOf(authoritySelectedID));
                 }
                 break;
             }

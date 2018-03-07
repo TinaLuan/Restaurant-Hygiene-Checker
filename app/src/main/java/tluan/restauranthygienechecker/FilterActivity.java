@@ -28,10 +28,12 @@ import java.util.Map;
 
 public class FilterActivity extends AppCompatActivity {
 
-     ArrayList<Integer> businessTypesIDList = new ArrayList<>();
-     ArrayList<Integer> ratingIDList = new ArrayList<>();
-     ArrayList<Integer> countryIDList = new ArrayList<>();
+    ArrayList<Integer> businessTypesIDList = new ArrayList<>();
+    ArrayList<Integer> ratingIDList = new ArrayList<>();
+    ArrayList<Integer> countryIDList = new ArrayList<>();
     ArrayList<Integer> authorityIDList = new ArrayList<>();
+
+    Intent resultIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +49,12 @@ public class FilterActivity extends AppCompatActivity {
         getWindow().setLayout( (int)(width*.7), (int)(height*.5) );
 
         setupOptions();
-        onDone();
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("some_key", "String data");
+        setupListeners();
 
-        setResult(RESULT_OK, resultIntent);
+        resultIntent = new Intent();
+        //resultIntent.putExtra("some_key", "String data");
+
+        //setResult(RESULT_OK, resultIntent);
 
 
         //finish();
@@ -111,7 +114,7 @@ public class FilterActivity extends AppCompatActivity {
     }
 
 
-    public void onDone() {
+    public void setupListeners() {
 
 
 //        AdapterView.OnItemSelectedListener myListener = new AdapterView.OnItemSelectedListener() {
@@ -135,6 +138,7 @@ public class FilterActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 Log.d("text", parentView.getItemAtPosition(position).toString());
                 Log.d("id", String.valueOf(businessTypesIDList.get(position)));
+                resultIntent.putExtra("businessTypeSelectedID",businessTypesIDList.get(position));
             }
 
             @Override
@@ -151,6 +155,7 @@ public class FilterActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 Log.d("text", parentView.getItemAtPosition(position).toString());
                 Log.d("id", String.valueOf(ratingIDList.get(position)));
+                resultIntent.putExtra("ratingSelectedID",ratingIDList.get(position));
             }
 
             @Override
@@ -167,6 +172,7 @@ public class FilterActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 Log.d("text", parentView.getItemAtPosition(position).toString());
                 Log.d("id", String.valueOf(authorityIDList.get(position)));
+                resultIntent.putExtra("authoritySelectedID",authorityIDList.get(position));
             }
 
             @Override
@@ -176,13 +182,14 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
-        Spinner countrySpinner = (Spinner)findViewById(R.id.country);
+        final Spinner countrySpinner = (Spinner)findViewById(R.id.country);
 
         countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 Log.d("text", parentView.getItemAtPosition(position).toString());
                 Log.d("id", String.valueOf(countryIDList.get(position)));
+                resultIntent.putExtra("countrySelectedID",countryIDList.get(position));
             }
 
             @Override
@@ -192,8 +199,16 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
+
     }
 
+
+    public void onDone(View view) {
+        //resultIntent.putExtra("ratingSelectedID",100);
+
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
 //    private MyOnItemSelectedListener extends AdapterView.OnItemSelectedListener{
 //
 //    }

@@ -54,7 +54,7 @@
 
     <TextView
         android:id="@+id/countryText"
-        android:text="Region:"
+        android:text="Country:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -67,5 +67,12 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/countryText"
         android:layout_below="@+id/authority"></Spinner>
+
+    <Button
+        android:id="@+id/doneButton"
+        android:onClick="onDone"
+        android:layout_below="@+id/country"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
