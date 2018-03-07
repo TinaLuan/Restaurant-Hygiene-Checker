@@ -1,6 +1,5 @@
 package tluan.restauranthygienechecker;
 
-import android.*;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -15,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -23,11 +21,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -44,8 +40,8 @@ public class SearchActivity extends AppCompatActivity {
     private Location mLastKnownLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private boolean mLocationPermissionGranted = false;
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 10;
+    //private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    //private static final int DEFAULT_ZOOM = 10;
     private static final String TAG = MapActivity.class.getSimpleName();
 
     private final int NUM_LOCAL_SEARCH_RESULTS = 15;
@@ -99,12 +95,7 @@ public class SearchActivity extends AppCompatActivity {
      * Gets the current location of the device, and positions the map's camera.
      */
     public void onLocalSearch(View view) {
-        //mMap.clear();
 
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (mLocationPermissionGranted) {
                 Log.d("per", "granted");
@@ -241,12 +232,6 @@ public class SearchActivity extends AppCompatActivity {
 
                 Log.d("one", (String.valueOf(jObj)));
 
-//                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
-//                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
-//                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
-//                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
-//                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
-//                        jObj.getJSONObject("geocode").getString("latitude"), jObj);
                 Establishment est = new Establishment(jObj);
                 establishments.add(est);
             }
@@ -255,22 +240,8 @@ public class SearchActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         estAdapter.notifyDataSetChanged();
-        //addMarkers(establishments);
     }
 
-    private void populateList() {
-
-    }
-//    private void addMarkers(ArrayList<Establishment> estList) {
-//        //mMap.clear();
-//        for (Establishment est : estList) {
-//            if (est.hasLatLng()) {
-//                LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
-//                //mMap.addMarker(new MarkerOptions().position(marker).title(est.getBusinessName()));
-//            }
-//        }
-//
-//    }
 
     // Check and ask for permission
     private void permission() {
