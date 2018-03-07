@@ -12,7 +12,7 @@ public class Establishment {
     //private String AddressLine4;
     private String localAuthorityName;
     private String localAuthorityEmailAddress;
-    private int scoreHygiene;
+    private String ratingValue;
     private String lngStr;
     private String latStr;
     private boolean hasLatLng;
@@ -21,7 +21,7 @@ public class Establishment {
 
     public Establishment(String FHRSID, String businessName,
                          String businessType, String addressLine, String localAuthorityName,
-                         String localAuthorityEmailAddress, int scoreHygiene, String lngStr,
+                         String localAuthorityEmailAddress, String ratingValue, String lngStr,
                          String latStr) {
         this.FHRSID = FHRSID;
         this.businessName = businessName;
@@ -29,7 +29,7 @@ public class Establishment {
         this.addressLine = addressLine;
         this.localAuthorityName = localAuthorityName;
         this.localAuthorityEmailAddress = localAuthorityEmailAddress;
-        this.scoreHygiene = scoreHygiene;
+        this.ratingValue = ratingValue;
         this.lngStr = lngStr;
         this.latStr = latStr;
 
@@ -68,8 +68,8 @@ public class Establishment {
         return localAuthorityEmailAddress;
     }
 
-    public int getScoreHygiene() {
-        return scoreHygiene;
+    public String getRatingValue() {
+        return ratingValue;
     }
 
     public Double getLongitude() {

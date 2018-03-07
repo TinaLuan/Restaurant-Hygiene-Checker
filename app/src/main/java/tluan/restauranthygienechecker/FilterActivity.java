@@ -1,7 +1,6 @@
 package tluan.restauranthygienechecker;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -10,21 +9,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import com.android.volley.Request;
+
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class FilterActivity extends AppCompatActivity {
 
@@ -52,15 +44,12 @@ public class FilterActivity extends AppCompatActivity {
         setupListeners();
 
         resultIntent = new Intent();
-        //resultIntent.putExtra("some_key", "String data");
 
-        //setResult(RESULT_OK, resultIntent);
-
-
-        //finish();
     }
 
     private void setupOptions() {
+
+        // Set up adapters for all spinners
         Spinner businessTypeSpinner = (Spinner)findViewById(R.id.businessType);
         final ArrayAdapter<String> businessTypeAdapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_spinner_item, android.R.id.text1);
@@ -86,11 +75,9 @@ public class FilterActivity extends AppCompatActivity {
         countrySpinner.setAdapter(countryAdapter);
 
 
-
-
-
+        // Make GET requests for spinners
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        //final String businessTypesSuffix = "BusinessTypes/basic";
+
         MyJsonObjectRequest objRequest1 = new MyJsonObjectRequest(
                 "BusinessTypes/basic", "businessTypes", "BusinessTypeName",
                 "BusinessTypeId", businessTypeAdapter, businessTypesIDList);
@@ -113,23 +100,9 @@ public class FilterActivity extends AppCompatActivity {
 
     }
 
-
+    /* Listeners for all spinners. Put selected item into intent
+    */
     public void setupListeners() {
-
-
-//        AdapterView.OnItemSelectedListener myListener = new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                Log.d("text", parentView.getItemAtPosition(position).toString());
-//                Log.d("id", String.valueOf(businessTypesIDList.get(position)));
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                // your code here
-//            }
-//
-//        };
 
         Spinner businessTypeSpinner = (Spinner)findViewById(R.id.businessType);
 
@@ -143,8 +116,7 @@ public class FilterActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
+                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();            }
 
         });
 
@@ -160,8 +132,7 @@ public class FilterActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
+                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();            }
 
         });
 
@@ -177,8 +148,7 @@ public class FilterActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
+                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();            }
 
         });
 
@@ -194,7 +164,7 @@ public class FilterActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
+                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();
             }
 
         });
@@ -202,15 +172,11 @@ public class FilterActivity extends AppCompatActivity {
 
     }
 
-
+    /* Put results and Close current activity
+     */
     public void onDone(View view) {
-        //resultIntent.putExtra("ratingSelectedID",100);
-
         setResult(RESULT_OK, resultIntent);
         finish();
     }
-//    private MyOnItemSelectedListener extends AdapterView.OnItemSelectedListener{
-//
-//    }
 
 }

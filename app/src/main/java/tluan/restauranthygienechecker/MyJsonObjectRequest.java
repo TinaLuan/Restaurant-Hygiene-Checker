@@ -49,23 +49,6 @@ public class MyJsonObjectRequest extends JsonObjectRequest {
         });
     }
 
-//    public MyJsonObjectRequest(String urlSuffix, Response.Listener<JSONObject> listener,
-//                               String arrayName, String stringName, String intName) {
-//        this.arrayName = arrayName;
-//        this.stringName = stringName;
-//        this.intName = intName;
-//        super(Method.GET, ROOT_URL + urlSuffix, null, listener, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.e("error", "!");
-//            }
-//        });
-//    }
-
-
-//        public MyJsonObjectRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-//            super(url, jsonRequest, listener, errorListener);
-//        }
 
     @Override
     public Map<String, String> getHeaders() {

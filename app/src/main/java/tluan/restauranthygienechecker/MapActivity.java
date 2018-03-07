@@ -55,42 +55,36 @@ import java.util.Map;
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private GoogleApiClient client;
-    //private LocationRequest locationRequest;
-    private Location lastlocation;
-    private Marker currentLocationmMarker;
-    public static final int REQUEST_LOCATION_CODE = 99;
-    int PROXIMITY_RADIUS = 10000;
 
-    private Location mLastKnownLocation;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-    private boolean mLocationPermissionGranted = false;
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 10;
-    private static final String TAG = MapActivity.class.getSimpleName();
+//    private Location mLastKnownLocation;
+//    private FusedLocationProviderClient mFusedLocationProviderClient;
+//    private boolean mLocationPermissionGranted = false;
+//    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+//    private static final int DEFAULT_ZOOM = 10;
+//    private static final String TAG = MapActivity.class.getSimpleName();
+//
+//    private final int NUM_LOCAL_SEARCH_RESULTS = 15;
 
-    private final int NUM_LOCAL_SEARCH_RESULTS = 15;
     private ArrayList<Establishment> establishments = new ArrayList<>();
-    private final int FILTER_ACTIVITY_REQ_CODE = 1;
 
-    private int businessTypeSelectedID;
-    private int ratingSelectedID;
-    private int countrySelectedID;
-    private int authoritySelectedID;
+//    private final int FILTER_ACTIVITY_REQ_CODE = 1;
+//
+//    private int businessTypeSelectedID;
+//    private int ratingSelectedID;
+//    private int countrySelectedID;
+//    private int authoritySelectedID;
+//
+//    public final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
 
-    private double latitude,longitude;
-
-    //public final static String LOCATION_PERMISSION = "location_permission";
-    //private boolean permission;
-    public final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
-
+    public static final String RESPONSE_STRING = "response_string";
+    String responseStr = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
+        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        Intent intent = getIntent();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -98,6 +92,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         //Intent intent = getIntent();
         //intent.getBooleanExtra(LOCATION_PERMISSION, permission);
+        responseStr = intent.getStringExtra(RESPONSE_STRING);
+
     }
 
 
@@ -115,139 +111,153 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap = googleMap;
 
 
-        permission();
-
-    }
-
-
-
-    /**
-     * Gets the current location of the device, and positions the map's camera.
-     */
-    public void onLocalSearch(View view) {
-        mMap.clear();
-
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
+        //permission();
         try {
-            if (mLocationPermissionGranted) {
-                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = task.getResult();
-                            double lat = mLastKnownLocation.getLatitude();
-                            double lng = mLastKnownLocation.getLongitude();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( new LatLng(lat, lng), DEFAULT_ZOOM));
-
-
-                            String URLsuffix = "Establishments?longitude=" + lng + "&latitude=" + lat +
-                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=" + String.valueOf(NUM_LOCAL_SEARCH_RESULTS);
-                            queryFSA(URLsuffix);
-
-                        } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
+            parseResponse(new JSONObject(responseStr));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
-
-    public void onSimpleSearch(View view) {
-        String input = ((EditText)findViewById(R.id.input)).getText().toString();
-        if (input != null && input.length() > 0) {
-            String URLsuffix = "Establishments?name="+ input +
-                    "&sortOptionKey=Rating&pageNumber=1&pageSize=5";
-            queryFSA(URLsuffix);
-        }
-
-    }
-
-    public void onAdvancedSearch(View view) {
-        Intent intent = new Intent(this, FilterActivity.class);
-
-        startActivityForResult(intent, FILTER_ACTIVITY_REQ_CODE);
-
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (FILTER_ACTIVITY_REQ_CODE) : {
-                if (resultCode == RESULT_OK) {
-                    businessTypeSelectedID = data.getIntExtra("businessTypeSelectedID" , businessTypeSelectedID);
-                    ratingSelectedID = data.getIntExtra("ratingSelectedID", ratingSelectedID);
-                    countrySelectedID = data.getIntExtra("countrySelectedID", countrySelectedID);
-                    authoritySelectedID = data.getIntExtra("authoritySelectedID", authoritySelectedID);
-                    Log.d("!!!!return", String.valueOf(businessTypeSelectedID) + " "+ String.valueOf(ratingSelectedID)
-                            + " "+ String.valueOf(countrySelectedID) + " "+String.valueOf(authoritySelectedID));
-                }
-                break;
-            }
-        }
-    }
-    private void queryFSA(String URLsuffix) {
-
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-
-        String URL = "http://api.ratings.food.gov.uk/" + URLsuffix;
-        System.out.println("URL:"+URL);
-        JsonObjectRequest objRequest = new JsonObjectRequest(URL, null,
-                new Response.Listener<JSONObject>() {
-                    // Called when a response is received.
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("response", String.valueOf(response));
-
-                        parseResponse(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("errorQuery" , "!");
-                    }
-                }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("x-api-version", "2");
-                return params;
-            }
-        };
-        requestQueue.add(objRequest);
-
-    }
-
+//
+//    /**
+//     * Gets the current location of the device, and positions the map's camera.
+//     */
+//    public void onLocalSearch(View view) {
+//        mMap.clear();
+//
+//        /*
+//         * Get the best and most recent location of the device, which may be null in rare
+//         * cases when a location is not available.
+//         */
+//        try {
+//            if (mLocationPermissionGranted) {
+//                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+//                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Location> task) {
+//                        if (task.isSuccessful()) {
+//                            // Set the map's camera position to the current location of the device.
+//                            mLastKnownLocation = task.getResult();
+//                            double lat = mLastKnownLocation.getLatitude();
+//                            double lng = mLastKnownLocation.getLongitude();
+//                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( new LatLng(lat, lng), DEFAULT_ZOOM));
+//
+//
+//                            String URLsuffix = "Establishments?longitude=" + lng + "&latitude=" + lat +
+//                                    "&sortOptionKey=Distance&pageNumber=1&pageSize=" + String.valueOf(NUM_LOCAL_SEARCH_RESULTS);
+//                            queryFSA(URLsuffix);
+//
+//                        } else {
+//                            Log.d(TAG, "Current location is null. Using defaults.");
+//                            Log.e(TAG, "Exception: %s", task.getException());
+//                            mMap.moveCamera(CameraUpdateFactory
+//                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+//                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+//                        }
+//                    }
+//                });
+//            }
+//        } catch (SecurityException e)  {
+//            Log.e("Exception: %s", e.getMessage());
+//        }
+//    }
+//
+//    public void onSimpleSearch(View view) {
+//        String input = ((EditText)findViewById(R.id.input)).getText().toString();
+//        if (input != null && input.length() > 0) {
+//            String URLsuffix = "Establishments?name="+ input +
+//                    "&sortOptionKey=Rating&pageNumber=1&pageSize=5";
+//            queryFSA(URLsuffix);
+//        }
+//
+//    }
+//
+//    public void onAdvancedSearch(View view) {
+//        Intent intent = new Intent(this, FilterActivity.class);
+//
+//        startActivityForResult(intent, FILTER_ACTIVITY_REQ_CODE);
+//
+//    }
+//
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch(requestCode) {
+//            case (FILTER_ACTIVITY_REQ_CODE) : {
+//                if (resultCode == RESULT_OK) {
+//                    businessTypeSelectedID = data.getIntExtra("businessTypeSelectedID" , businessTypeSelectedID);
+//                    ratingSelectedID = data.getIntExtra("ratingSelectedID", ratingSelectedID);
+//                    countrySelectedID = data.getIntExtra("countrySelectedID", countrySelectedID);
+//                    authoritySelectedID = data.getIntExtra("authoritySelectedID", authoritySelectedID);
+//                    Log.d("!!!!return", String.valueOf(businessTypeSelectedID) + " "+ String.valueOf(ratingSelectedID)
+//                            + " "+ String.valueOf(countrySelectedID) + " "+String.valueOf(authoritySelectedID));
+//
+//                    String URLsuffix = "Establishments?";
+//                    String input = ((EditText)findViewById(R.id.input)).getText().toString();
+//                    if (input != null && input.length() > 0) {
+//                        URLsuffix += "name=" + input + "&";
+//                    }
+//                    URLsuffix += "businessTypeId="+businessTypeSelectedID+"&ratingKey="+ratingSelectedID+
+//                            "&localAuthorityId="+authoritySelectedID+"&countryId="+ countrySelectedID+
+//                            "&sortOptionKey=Rating&pageNumber=1&pageSize=5";
+//                    Log.d("suffix", URLsuffix);
+//                    queryFSA(URLsuffix);
+//                }
+//                break;
+//            }
+//        }
+//    }
+//    private void queryFSA(String URLsuffix) {
+//
+//        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//
+//        String URL = "http://api.ratings.food.gov.uk/" + URLsuffix;
+//        System.out.println("URL:"+URL);
+//        JsonObjectRequest objRequest = new JsonObjectRequest(URL, null,
+//                new Response.Listener<JSONObject>() {
+//                    // Called when a response is received.
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        Log.d("response", String.valueOf(response));
+//
+//                        parseResponse(response);
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("errorQuery" , "!");
+//                    }
+//                }
+//        ) {
+//            @Override
+//            public Map<String, String> getHeaders() {
+//                Map<String, String>  params = new HashMap<String, String>();
+//                params.put("Accept", "application/json");
+//                params.put("x-api-version", "2");
+//                return params;
+//            }
+//        };
+//        requestQueue.add(objRequest);
+//
+//    }
+//
     private void parseResponse(JSONObject response) {
         establishments.clear();
         try {
             JSONArray array = response.getJSONArray("establishments");
-
+            if (array.length() == 0)
+                Toast.makeText(getApplicationContext(), "No Establishments satisfies the criteria", Toast.LENGTH_LONG).show();
             for (int i=0; i<array.length(); i++) {
                 JSONObject jObj = array.getJSONObject(i);
 
-                Log.d("one", (String.valueOf(jObj)));
+                //Log.d("one", (String.valueOf(jObj)));
 
                 Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
                         jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
                         jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
                         jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
-                        jObj.getJSONObject("scores").getInt("Hygiene"), jObj.getJSONObject("geocode").getString("longitude"),
+                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
                         jObj.getJSONObject("geocode").getString("latitude"));
                 establishments.add(est);
             }
@@ -259,6 +269,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void addMarkers(ArrayList<Establishment> estList) {
+        mMap.clear();
         for (Establishment est : estList) {
             if (est.hasLatLng()) {
                 LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
@@ -268,67 +279,67 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
 
     }
-
-    // Check and ask for permission
-    private void permission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-
-            mMap.setMyLocationEnabled(true);
-            mLocationPermissionGranted = true;
-
-        } else {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION },
-                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        }
-
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted
-                    if (ContextCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-
-                        mMap.setMyLocationEnabled(true);
-                        mLocationPermissionGranted = true;
-                    }
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
-                    mMap.setMyLocationEnabled(false);
-                }
-        }
-    }
+//
+//    // Check and ask for permission
+//    private void permission() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//                == PackageManager.PERMISSION_GRANTED) {
+//
+//            mMap.setMyLocationEnabled(true);
+//            mLocationPermissionGranted = true;
+//
+//        } else {
+//            // Should we show an explanation?
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+//
+//                // Show an explanation to the user *asynchronously* -- don't block
+//                // this thread waiting for the user's response! After the user
+//                // sees the explanation, try again to request the permission.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION },
+//                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+//            } else {
+//
+//                // No explanation needed, we can request the permission.
+//
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+//
+//                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//                // app-defined int constant. The callback method gets the
+//                // result of the request.
+//            }
+//        }
+//
+//
+//    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           String permissions[], int[] grantResults) {
+//        switch (requestCode) {
+//            case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    // permission was granted
+//                    if (ContextCompat.checkSelfPermission(this,
+//                            Manifest.permission.ACCESS_FINE_LOCATION)
+//                            == PackageManager.PERMISSION_GRANTED) {
+//
+//                        mMap.setMyLocationEnabled(true);
+//                        mLocationPermissionGranted = true;
+//                    }
+//                } else {
+//
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                    Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
+//                    mMap.setMyLocationEnabled(false);
+//                }
+//        }
+//    }
 }
