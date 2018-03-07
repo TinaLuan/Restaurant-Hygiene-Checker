@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SearchActivity" >
+        <activity android:name=".SearchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,11 +28,12 @@
 
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_map">
-
-        </activity>
+            android:label="@string/title_activity_map"></activity>
         <activity android:name=".LaunchActivity" />
-        <activity android:name=".FilterActivity"></activity>
+        <activity android:name=".FilterActivity" />
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/title_activity_detail"></activity>
     </application>
 
 </manifest>

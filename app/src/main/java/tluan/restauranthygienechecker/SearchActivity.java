@@ -11,7 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +49,9 @@ public class SearchActivity extends AppCompatActivity {
     private static final String TAG = MapActivity.class.getSimpleName();
 
     private final int NUM_LOCAL_SEARCH_RESULTS = 15;
-    private ArrayList<Establishment> establishments = new ArrayList<>();
+    private ArrayList<Establishment> establishments;
+    private ArrayAdapter<Establishment> estAdapter;
+
     private final int FILTER_ACTIVITY_REQ_CODE = 1;
 
     private int businessTypeSelectedID;
@@ -66,9 +71,29 @@ public class SearchActivity extends AppCompatActivity {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         permission();
+
+        establishments = new ArrayList<>();
+        estAdapter = new ArrayAdapter<Establishment>(this,
+                android.R.layout.simple_selectable_list_item, establishments);
+        setupList();
     }
 
+    private void setupList() {
+        ListView listView = (ListView) findViewById(R.id.estListView);
+        listView.setAdapter(estAdapter);
+        final AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Establishment clickedItem = (Establishment) estAdapter.getItem(position);
 
+                Intent intent = new Intent(SearchActivity.this, DetailActivity.class);
+                String jsonObjectStr = clickedItem.getJsonObject().toString();
+                intent.putExtra(DetailActivity.JSON_OBJECT_STR, jsonObjectStr);
+                startActivity(intent);
+            }
+        };
+        listView.setOnItemClickListener(itemClickListener);
+    }
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -216,31 +241,36 @@ public class SearchActivity extends AppCompatActivity {
 
                 Log.d("one", (String.valueOf(jObj)));
 
-                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
-                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
-                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
-                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
-                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
-                        jObj.getJSONObject("geocode").getString("latitude"));
+//                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
+//                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
+//                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
+//                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
+//                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
+//                        jObj.getJSONObject("geocode").getString("latitude"), jObj);
+                Establishment est = new Establishment(jObj);
                 establishments.add(est);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        estAdapter.notifyDataSetChanged();
         //addMarkers(establishments);
     }
 
-    private void addMarkers(ArrayList<Establishment> estList) {
-        //mMap.clear();
-        for (Establishment est : estList) {
-            if (est.hasLatLng()) {
-                LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
-                //mMap.addMarker(new MarkerOptions().position(marker).title(est.getBusinessName()));
-            }
-        }
+    private void populateList() {
 
     }
+//    private void addMarkers(ArrayList<Establishment> estList) {
+//        //mMap.clear();
+//        for (Establishment est : estList) {
+//            if (est.hasLatLng()) {
+//                LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
+//                //mMap.addMarker(new MarkerOptions().position(marker).title(est.getBusinessName()));
+//            }
+//        }
+//
+//    }
 
     // Check and ask for permission
     private void permission() {

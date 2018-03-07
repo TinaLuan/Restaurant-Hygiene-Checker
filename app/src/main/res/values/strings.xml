@@ -7,4 +7,5 @@
     <string-array name="businessTypes">
 
     </string-array>
+    <string name="title_activity_detail">Detail</string>
 </resources>

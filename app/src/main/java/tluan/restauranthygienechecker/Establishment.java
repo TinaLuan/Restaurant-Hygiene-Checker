@@ -1,5 +1,8 @@
 package tluan.restauranthygienechecker;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Establishment {
     private String FHRSID;
     //private String localAuthorityBusinessID;
@@ -18,6 +21,8 @@ public class Establishment {
     private boolean hasLatLng;
     private Double lng;
     private Double lat;
+
+    private JSONObject jObj;
 
     public Establishment(String FHRSID, String businessName,
                          String businessType, String addressLine, String localAuthorityName,
@@ -42,6 +47,26 @@ public class Establishment {
             lat = null;
             hasLatLng = false;
         }
+    }
+
+    public Establishment (JSONObject jObj) throws JSONException {
+
+        this(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
+                    jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
+                    jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
+                    jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
+                    jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
+                    jObj.getJSONObject("geocode").getString("latitude"));
+        this.jObj = jObj;
+
+    }
+    @Override
+    public String toString() {
+        return  getBusinessName();
+    }
+
+    public JSONObject getJsonObject() {
+        return jObj;
     }
 
     public String getFHRSID() {

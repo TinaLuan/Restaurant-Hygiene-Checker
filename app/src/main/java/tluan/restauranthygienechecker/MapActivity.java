@@ -114,6 +114,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         //permission();
         try {
             parseResponse(new JSONObject(responseStr));
+            addMarkers(establishments);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -253,19 +254,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                 //Log.d("one", (String.valueOf(jObj)));
 
-                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
-                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
-                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
-                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
-                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
-                        jObj.getJSONObject("geocode").getString("latitude"));
+//                Establishment est = new Establishment(jObj.getString("FHRSID"), jObj.getString("BusinessName"),
+//                        jObj.getString("BusinessType"), jObj.getString("AddressLine1") +
+//                        jObj.getString("AddressLine2")+jObj.getString("AddressLine3")+ jObj.getString("AddressLine4"),
+//                        jObj.getString("LocalAuthorityName"),jObj.getString("LocalAuthorityEmailAddress"),
+//                        jObj.getString("RatingValue"), jObj.getJSONObject("geocode").getString("longitude"),
+//                        jObj.getJSONObject("geocode").getString("latitude"), jObj);
+                Establishment est = new Establishment(jObj);
                 establishments.add(est);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        addMarkers(establishments);
+
     }
 
     private void addMarkers(ArrayList<Establishment> estList) {
