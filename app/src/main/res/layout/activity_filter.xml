@@ -53,7 +53,7 @@
         android:layout_below="@+id/rating"></Spinner>
 
     <TextView
-        android:id="@+id/regionText"
+        android:id="@+id/countryText"
         android:text="Region:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,11 +61,11 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/authorityText"/>
     <Spinner
-        android:id="@+id/region"
+        android:id="@+id/country"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/regionText"
+        android:layout_toEndOf="@+id/countryText"
         android:layout_below="@+id/authority"></Spinner>
 
 </RelativeLayout>
