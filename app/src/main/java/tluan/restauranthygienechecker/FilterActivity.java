@@ -99,7 +99,7 @@ public class FilterActivity extends AppCompatActivity {
         requestQueue.add(objRequest2);
 
         MyJsonObjectRequest objRequest3 = new MyJsonObjectRequest(
-                "Countries/basic", "countries", "name",
+                "Countries", "countries", "nameKey",
                 "id", regionAdapter, regionIDList);
         requestQueue.add(objRequest3);
 
@@ -179,23 +179,6 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
-//        final Spinner radiusSpinner = (Spinner)findViewById(R.id.radius);
-//        radiusSpinner.setClickable(false);
-//
-//        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                Log.d("text", parentView.getItemAtPosition(position).toString());
-//                Log.d("id", String.valueOf(radiusList.get(position)));
-//                resultIntent.putExtra("radiusSelectedID",radiusList.get(position));
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();
-//            }
-//
-//        });
 
         final EditText radius = (EditText)findViewById(R.id.radius);
 
@@ -205,15 +188,21 @@ public class FilterActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     //radiusSpinner.setClickable(true);
-                    radius.setEnabled(true);
+                    radius.setFocusable(true);
+                    radius.setClickable(true);
                     resultIntent.putExtra("radiusStr",radius.getText().toString());
                     resultIntent.putExtra("toggleChecked", true);
                     authoritySpinner.setClickable(false);
+                    authoritySpinner.setEnabled(false);
                     regionSpinner.setClickable(false);
+                    regionSpinner.setEnabled(false);
                 } else {
                     authoritySpinner.setClickable(true);
+                    authoritySpinner.setEnabled(true);
+                    regionSpinner.setEnabled(true);
                     regionSpinner.setClickable(true);
-                    radius.setEnabled(false);
+                    radius.setFocusable(false);
+                    radius.setClickable(false);
                     resultIntent.putExtra("toggleChecked", false);
                 }
             }

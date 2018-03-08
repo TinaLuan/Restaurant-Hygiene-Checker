@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -52,16 +53,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener
+{
 
     private GoogleMap mMap;
 
 
     private ArrayList<Establishment> establishments = new ArrayList<>();
+    private ArrayList<Marker> markers = new ArrayList<>();
 
+    private Establishment currentEst = null;
 
     public static final String RESPONSE_STRING = "response_string";
     String responseStr = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +80,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mapFragment.getMapAsync(this);
 
         responseStr = intent.getStringExtra(RESPONSE_STRING);
-
+        //setupTextView();
     }
 
 
@@ -97,6 +103,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        mMap.setOnMarkerClickListener(this);
     }
 
     private void parseResponse(JSONObject response) {
@@ -112,6 +119,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                 establishments.add(est);
             }
+            currentEst = establishments.get(0);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -123,12 +131,40 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.clear();
         for (Establishment est : estList) {
             if (est.hasLatLng()) {
-                LatLng marker = new LatLng(est.getLatitude(), est.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(marker)
+                LatLng pos = new LatLng(est.getLatitude(), est.getLongitude());
+
+                Marker newMarker = mMap.addMarker(new MarkerOptions().position(pos)
                         .title(est.getBusinessName()));
+                markers.add(newMarker);
             }
         }
 
     }
 
+    private void setupTextView(Establishment est) {
+        TextView detail = (TextView)findViewById(R.id.detailTextView);
+        if (est != null) {
+            String text = "Name: " + est.getBusinessName() + "\n" +
+                    "Business Type: " + est.getBusinessType() + "\n" +
+                    "Rating: " + est.getRatingValue() + "\n" +
+                    "Address" + est.getAddressLine() + "\n" +
+                    "Authority" + est.getLocalAuthorityName() + "\n" +
+                    "Authority Email: " + est.getLocalAuthorityEmailAddress();
+
+
+            detail.setText(text);
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker currentMarker) {
+        Log.d("marker",currentMarker.getId());
+        for (int i =0; i<markers.size();i++){
+            if (currentMarker.getId().equals( markers.get(i).getId())) {
+                Log.d("marker!!", String.valueOf(i));
+                setupTextView(establishments.get(i));
+            }
+        }
+        return false;
+    }
 }

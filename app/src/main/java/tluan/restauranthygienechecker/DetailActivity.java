@@ -3,6 +3,10 @@ package tluan.restauranthygienechecker;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ShareActionProvider;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,4 +84,15 @@ public class DetailActivity extends FragmentActivity implements OnMapReadyCallba
 
         detail.setText(text);
     }
+
+    public void onShare(View view) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        String shareBody = est.getAddressLine();
+        String shareSub = "Share: "+ est.getBusinessName();
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(shareIntent, "share using"));
+    }
+
 }
