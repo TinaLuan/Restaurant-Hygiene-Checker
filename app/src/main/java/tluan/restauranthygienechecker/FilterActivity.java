@@ -8,8 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 
 import com.android.volley.RequestQueue;
@@ -22,8 +25,9 @@ public class FilterActivity extends AppCompatActivity {
 
     ArrayList<Integer> businessTypesIDList = new ArrayList<>();
     ArrayList<Integer> ratingIDList = new ArrayList<>();
-    ArrayList<Integer> countryIDList = new ArrayList<>();
+    ArrayList<Integer> regionIDList = new ArrayList<>();
     ArrayList<Integer> authorityIDList = new ArrayList<>();
+    ArrayList<Integer> radiusList = new ArrayList<>();
 
     Intent resultIntent;
 
@@ -32,13 +36,14 @@ public class FilterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
 
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
+//        DisplayMetrics dm = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(dm);
+//
+//        int width = dm.widthPixels;
+//        int height = dm.heightPixels;
+//
+//        getWindow().setLayout( (int)(width*.7), (int)(height*.5) );
 
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-
-        getWindow().setLayout( (int)(width*.7), (int)(height*.5) );
 
         setupOptions();
         setupListeners();
@@ -68,11 +73,16 @@ public class FilterActivity extends AppCompatActivity {
         authorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         authoritySpinner.setAdapter(authorityAdapter);
 
-        Spinner countrySpinner = (Spinner)findViewById(R.id.country);
-        final ArrayAdapter<String> countryAdapter = new ArrayAdapter<String>(getApplicationContext(),
+        Spinner regionSpinner = (Spinner)findViewById(R.id.region);
+        final ArrayAdapter<String> regionAdapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_spinner_item, android.R.id.text1);
-        countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        countrySpinner.setAdapter(countryAdapter);
+        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        regionSpinner.setAdapter(regionAdapter);
+
+//        Spinner radiusSpinner = (Spinner)findViewById(R.id.radius);
+//        final ArrayAdapter<String> radiusAdapter = ArrayAdapter.createFromResource();
+//        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        regionSpinner.setAdapter(regionAdapter);
 
 
         // Make GET requests for spinners
@@ -90,7 +100,7 @@ public class FilterActivity extends AppCompatActivity {
 
         MyJsonObjectRequest objRequest3 = new MyJsonObjectRequest(
                 "Countries/basic", "countries", "name",
-                "id", countryAdapter, countryIDList);
+                "id", regionAdapter, regionIDList);
         requestQueue.add(objRequest3);
 
         MyJsonObjectRequest objRequest4 = new MyJsonObjectRequest(
@@ -136,7 +146,7 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
-        Spinner authoritySpinner = (Spinner)findViewById(R.id.authority);
+        final Spinner authoritySpinner = (Spinner)findViewById(R.id.authority);
 
         authoritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -152,14 +162,14 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
-        final Spinner countrySpinner = (Spinner)findViewById(R.id.country);
+        final Spinner regionSpinner = (Spinner)findViewById(R.id.region);
 
-        countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        regionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 Log.d("text", parentView.getItemAtPosition(position).toString());
-                Log.d("id", String.valueOf(countryIDList.get(position)));
-                resultIntent.putExtra("countrySelectedID",countryIDList.get(position));
+                Log.d("id", String.valueOf(regionIDList.get(position)));
+                resultIntent.putExtra("countrySelectedID",regionIDList.get(position));
             }
 
             @Override
@@ -169,6 +179,45 @@ public class FilterActivity extends AppCompatActivity {
 
         });
 
+//        final Spinner radiusSpinner = (Spinner)findViewById(R.id.radius);
+//        radiusSpinner.setClickable(false);
+//
+//        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+//                Log.d("text", parentView.getItemAtPosition(position).toString());
+//                Log.d("id", String.valueOf(radiusList.get(position)));
+//                resultIntent.putExtra("radiusSelectedID",radiusList.get(position));
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parentView) {
+//                Toast.makeText(getApplicationContext(), "Please make selections", Toast.LENGTH_LONG).show();
+//            }
+//
+//        });
+
+        final EditText radius = (EditText)findViewById(R.id.radius);
+
+
+        ToggleButton toggle = (ToggleButton) findViewById(R.id.toggle);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    //radiusSpinner.setClickable(true);
+                    radius.setEnabled(true);
+                    resultIntent.putExtra("radiusStr",radius.getText().toString());
+                    resultIntent.putExtra("toggleChecked", true);
+                    authoritySpinner.setClickable(false);
+                    regionSpinner.setClickable(false);
+                } else {
+                    authoritySpinner.setClickable(true);
+                    regionSpinner.setClickable(true);
+                    radius.setEnabled(false);
+                    resultIntent.putExtra("toggleChecked", false);
+                }
+            }
+        });
 
     }
 

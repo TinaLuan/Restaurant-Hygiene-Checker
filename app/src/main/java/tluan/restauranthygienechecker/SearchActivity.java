@@ -52,8 +52,11 @@ public class SearchActivity extends AppCompatActivity {
 
     private int businessTypeSelectedID;
     private int ratingSelectedID;
-    private int countrySelectedID;
+    private boolean toggleChecked = false;
+    private int regionSelectedID;
     private int authoritySelectedID;
+    private String radiusStr = "10";
+
 
     public final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
 
@@ -152,21 +155,33 @@ public class SearchActivity extends AppCompatActivity {
         switch(requestCode) {
             case (FILTER_ACTIVITY_REQ_CODE) : {
                 if (resultCode == RESULT_OK) {
-                    businessTypeSelectedID = data.getIntExtra("businessTypeSelectedID" , businessTypeSelectedID);
-                    ratingSelectedID = data.getIntExtra("ratingSelectedID", ratingSelectedID);
-                    countrySelectedID = data.getIntExtra("countrySelectedID", countrySelectedID);
-                    authoritySelectedID = data.getIntExtra("authoritySelectedID", authoritySelectedID);
-                    Log.d("!!!!return", String.valueOf(businessTypeSelectedID) + " "+ String.valueOf(ratingSelectedID)
-                            + " "+ String.valueOf(countrySelectedID) + " "+String.valueOf(authoritySelectedID));
 
                     String URLsuffix = "Establishments?";
                     String input = ((EditText)findViewById(R.id.input)).getText().toString();
                     if (input != null && input.length() > 0) {
                         URLsuffix += "name=" + input + "&";
                     }
-                    URLsuffix += "businessTypeId="+businessTypeSelectedID+"&ratingKey="+ratingSelectedID+
-                            "&localAuthorityId="+authoritySelectedID+"&countryId="+ countrySelectedID+
-                            "&sortOptionKey=Rating&pageNumber=1&pageSize=5";
+
+                    businessTypeSelectedID = data.getIntExtra("businessTypeSelectedID" , businessTypeSelectedID);
+                    ratingSelectedID = data.getIntExtra("ratingSelectedID", ratingSelectedID);
+                    URLsuffix += "businessTypeId="+businessTypeSelectedID+"&ratingKey="+ratingSelectedID;
+                    toggleChecked = data.getBooleanExtra("toggleChecked",toggleChecked);
+                    if (!toggleChecked) {
+                        regionSelectedID = data.getIntExtra("regionSelectedID", regionSelectedID);
+                        authoritySelectedID = data.getIntExtra("authoritySelectedID", authoritySelectedID);
+                        URLsuffix += "&localAuthorityId="+authoritySelectedID+"&countryId="+ regionSelectedID;
+
+                    } else {
+                        radiusStr = data.getStringExtra("radiusStr");
+                        URLsuffix += "&maxDistanceLimit="+radiusStr;
+                    }
+                    URLsuffix += "&sortOptionKey=Rating&pageNumber=1&pageSize=10";
+
+                    //Log.d("!!!!return", String.valueOf(businessTypeSelectedID) + " "+ String.valueOf(ratingSelectedID)
+                            //+ " "+ String.valueOf(regionSelectedID) + " "+String.valueOf(authoritySelectedID));
+
+
+
                     Log.d("suffix", URLsuffix);
                     queryFSA(URLsuffix);
                 }
